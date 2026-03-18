@@ -887,6 +887,26 @@ export function attachGatewayWsMessageHandler(params: {
           ? await ensureDeviceToken({ deviceId: device.id, role, scopes })
           : null;
 
+        // If ensureDeviceToken returns an error object, reject the handshake
+        if (deviceToken && "error" in deviceToken) {
+          setHandshakeState("failed");
+          setCloseCause("scope-escalation-detected", {
+            error: deviceToken.error,
+            message: deviceToken.message,
+            details: deviceToken.details,
+          });
+          send({
+            type: "res",
+            id: frame.id,
+            ok: false,
+            error: errorShape(ErrorCodes.INVALID_REQUEST, deviceToken.message, {
+              details: deviceToken.details,
+            }),
+          });
+          close(1008, deviceToken.message);
+          return;
+        }
+
         if (role === "node") {
           const cfg = loadConfig();
           const allowlist = resolveNodeCommandAllowlist(cfg, {

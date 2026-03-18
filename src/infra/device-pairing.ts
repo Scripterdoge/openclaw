@@ -559,7 +559,7 @@ export async function ensureDeviceToken(params: {
   role: string;
   scopes: string[];
   baseDir?: string;
-}): Promise<DeviceAuthToken | null> {
+}): Promise<DeviceAuthToken | { error: string; message: string; details: { role: string; requestedScopes: string[]; approvedScopes: string[] | null } } | null> {
   return await withLock(async () => {
     const state = await loadState(params.baseDir);
     const requestedScopes = normalizeDeviceAuthScopes(params.scopes);
@@ -579,9 +579,12 @@ export async function ensureDeviceToken(params: {
         scopes: requestedScopes,
         approvedScopes,
       })
-    ) {
-      return null;
-    }
+    )
+    return {
+      error: "SCOPE_ESCALATION_DETECTED",
+      message: "Requested scopes exceed approved baseline",
+      details: { role, requestedScopes, approvedScopes }
+    };
     if (existing && !existing.revokedAtMs) {
       const existingWithinApproved = scopesWithinApprovedDeviceBaseline({
         role,

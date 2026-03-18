@@ -286,7 +286,15 @@ describe("device pairing tokens", () => {
       scopes: ["operator.admin"],
       baseDir,
     });
-    expect(ensured).toBeNull();
+    expect(ensured).toEqual({
+      error: "SCOPE_ESCALATION_DETECTED",
+      message: "Requested scopes exceed approved baseline",
+      details: {
+        role: "operator",
+        requestedScopes: ["operator.admin"],
+        approvedScopes: ["operator.read"],
+      },
+    });
 
     const after = await getPairedDevice("device-1", baseDir);
     expect(after?.tokens?.operator?.token).toEqual(before?.tokens?.operator?.token);
@@ -392,7 +400,15 @@ describe("device pairing tokens", () => {
         scopes: ["operator.admin"],
         baseDir,
       }),
-    ).resolves.toBeNull();
+    ).resolves.toEqual({
+      error: "SCOPE_ESCALATION_DETECTED",
+      message: "Requested scopes exceed approved baseline",
+      details: {
+        role: "operator",
+        requestedScopes: ["operator.admin"],
+        approvedScopes: null,
+      },
+    });
   });
 
   test("fails closed when the paired device approval baseline is missing during rotation", async () => {
