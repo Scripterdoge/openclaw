@@ -56,7 +56,7 @@ export type RotateDeviceTokenDenyReason =
 export type RotateDeviceTokenResult =
   | { ok: true; entry: DeviceAuthToken }
   | { ok: false; reason: RotateDeviceTokenDenyReason }
-  | { error: string; message: string; details: Record<string, unknown> };
+  | { error: "SCOPE_ESCALATION_DETECTED"; message: string; details: { role: string; requestedScopes: string[]; approvedScopes: string[] | null } };
 
 export type PairedDevice = {
   deviceId: string;

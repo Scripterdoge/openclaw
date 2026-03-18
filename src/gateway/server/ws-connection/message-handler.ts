@@ -888,14 +888,13 @@ export function attachGatewayWsMessageHandler(params: {
           const tokenResult = await ensureDeviceToken({ deviceId: device.id, role, scopes });
           // Check if the result is an error object
           if ('error' in tokenResult) {
-            logWs("warn", "device-token-error", {
+            logWsControl.warn(`scope escalation detected: ${tokenResult.message}`, {
               connId,
               deviceId: device.id,
               role,
               scopes,
               error: tokenResult.error,
-              message: tokenResult.message,
-              details: tokenResult.details
+              details: tokenResult.details,
             });
             // Set deviceToken to null to prevent connection with invalid token
             deviceToken = null;
