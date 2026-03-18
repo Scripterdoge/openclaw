@@ -327,6 +327,8 @@ export const deviceHandlers: GatewayRequestHandlers = {
       return;
     }
     context.logGateway.info(`device token revoked device=${deviceId} role=${entry.role}`);
+    }
+    context.logGateway.info(`device token revoked device=${deviceId} role=${entry.role}`);
     respond(
       true,
       { deviceId, role: entry.role, revokedAtMs: entry.revokedAtMs ?? Date.now() },
