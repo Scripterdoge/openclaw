@@ -896,6 +896,15 @@ export function attachGatewayWsMessageHandler(params: {
                 scopes,
                 error: tokenResult.error,
                 details: tokenResult.details,
+          if ('error' in tokenResult) {
+            if (tokenResult.error === "SCOPE_ESCALATION_DETECTED") {
+              logWsControl.warn(`scope escalation detected: ${tokenResult.message}`, {
+                connId,
+                deviceId: device.id,
+                role,
+                scopes,
+                error: tokenResult.error,
+                details: tokenResult.details,
               });
             } else {
               logWsControl.warn(`device token unavailable: ${tokenResult.message}`, {
@@ -906,6 +915,7 @@ export function attachGatewayWsMessageHandler(params: {
               });
             }
             // Set deviceToken to null to prevent connection with invalid token
+            deviceToken = null;
             deviceToken = null;
           } else {
             // Success case - tokenResult is a DeviceAuthToken
