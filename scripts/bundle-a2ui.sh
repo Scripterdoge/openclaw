@@ -2,8 +2,8 @@
 set -euo pipefail
 
 on_error() {
-  echo "A2UI bundling failed. Re-run with: npx pnpm canvas:a2ui:bundle" >&2
-  echo "If this persists, verify npx pnpm deps and try again." >&2
+  echo "A2UI bundling failed. Re-run with: pnpm canvas:a2ui:bundle" >&2
+  echo "If this persists, verify pnpm deps and try again." >&2
 }
 trap on_error ERR
 
@@ -94,7 +94,7 @@ elif [[ -f "$ROOT_DIR/node_modules/.pnpm/rolldown@1.0.0-rc.9/node_modules/rolldo
   node "$ROOT_DIR/node_modules/.pnpm/rolldown@1.0.0-rc.9/node_modules/rolldown/bin/cli.mjs" \
     -c "$A2UI_APP_DIR/rolldown.config.mjs"
 else
-  npx pnpm -s dlx rolldown -c "$A2UI_APP_DIR/rolldown.config.mjs"
+  pnpm -s dlx rolldown -c "$A2UI_APP_DIR/rolldown.config.mjs"
 fi
 
 echo "$current_hash" > "$HASH_FILE"
