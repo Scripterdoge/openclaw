@@ -56,7 +56,11 @@ export type RotateDeviceTokenDenyReason =
 export type RotateDeviceTokenResult =
   | { ok: true; entry: DeviceAuthToken }
   | { ok: false; reason: RotateDeviceTokenDenyReason }
-  | { error: "SCOPE_ESCALATION_DETECTED"; message: string; details: { role: string; requestedScopes: string[]; approvedScopes: string[] | null } };
+  | {
+      error: "SCOPE_ESCALATION_DETECTED";
+      message: string;
+      details: { role: string; requestedScopes: string[]; approvedScopes: string[] | null };
+    };
 
 export type PairedDevice = {
   deviceId: string;
@@ -579,7 +583,9 @@ export async function ensureDeviceToken(params: {
   role: string;
   scopes: string[];
   baseDir?: string;
-}): Promise<{ error: string; message: string; details: Record<string, unknown> } | DeviceAuthToken> {
+}): Promise<
+  { error: string; message: string; details: Record<string, unknown> } | DeviceAuthToken
+> {
   return await withLock(async () => {
     const state = await loadState(params.baseDir);
     const requestedScopes = normalizeDeviceAuthScopes(params.scopes);
@@ -592,7 +598,7 @@ export async function ensureDeviceToken(params: {
       return {
         error: "DEVICE_OR_ROLE_NOT_FOUND",
         message: "Device or role not found",
-        details: { deviceId: params.deviceId, role: params.role }
+        details: { deviceId: params.deviceId, role: params.role },
       };
     }
     const { device, role, tokens, existing } = context;
@@ -607,7 +613,7 @@ export async function ensureDeviceToken(params: {
       return {
         error: "SCOPE_ESCALATION_DETECTED",
         message: "Requested scopes exceed approved baseline",
-        details: { role, requestedScopes, approvedScopes }
+        details: { role, requestedScopes, approvedScopes },
       };
     }
     if (existing && !existing.revokedAtMs) {
@@ -696,7 +702,7 @@ export async function rotateDeviceToken(params: {
       return {
         error: "SCOPE_ESCALATION_DETECTED",
         message: "Requested scopes exceed approved baseline",
-        details: { role, requestedScopes, approvedScopes }
+        details: { role, requestedScopes, approvedScopes },
       };
     }
     const now = Date.now();
@@ -719,7 +725,9 @@ export async function revokeDeviceToken(params: {
   deviceId: string;
   role: string;
   baseDir?: string;
-}): Promise<DeviceAuthToken | { error: string; message: string; details: Record<string, unknown> }> {
+}): Promise<
+  DeviceAuthToken | { error: string; message: string; details: Record<string, unknown> }
+> {
   return await withLock(async () => {
     const state = await loadState(params.baseDir);
     const device = state.pairedByDeviceId[normalizeDeviceId(params.deviceId)];
@@ -727,7 +735,7 @@ export async function revokeDeviceToken(params: {
       return {
         error: "DEVICE_NOT_FOUND",
         message: "Device not found",
-        details: { deviceId: params.deviceId }
+        details: { deviceId: params.deviceId },
       };
     }
     const role = normalizeRole(params.role);
@@ -735,14 +743,14 @@ export async function revokeDeviceToken(params: {
       return {
         error: "ROLE_NOT_FOUND",
         message: "Role not found",
-        details: { role: params.role }
+        details: { role: params.role },
       };
     }
     if (!device.tokens?.[role]) {
       return {
         error: "TOKEN_NOT_FOUND",
         message: "Token not found for role",
-        details: { deviceId: params.deviceId, role: params.role }
+        details: { deviceId: params.deviceId, role: params.role },
       };
     }
     const tokens = { ...device.tokens };

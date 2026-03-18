@@ -60,7 +60,11 @@ function logDeviceTokenRotationDenied(params: {
   log: { warn: (message: string) => void };
   deviceId: string;
   role: string;
-  reason: RotateDeviceTokenDenyReason | "caller-missing-scope" | "unknown-device-or-role" | "SCOPE_ESCALATION_DETECTED";
+  reason:
+    | RotateDeviceTokenDenyReason
+    | "caller-missing-scope"
+    | "unknown-device-or-role"
+    | "SCOPE_ESCALATION_DETECTED";
   scope?: string | null;
   message?: string;
   details?: Record<string, unknown>;
@@ -254,7 +258,7 @@ export const deviceHandlers: GatewayRequestHandlers = {
       return;
     }
     const rotated = await rotateDeviceToken({ deviceId, role, scopes });
-    if ('error' in rotated) {
+    if ("error" in rotated) {
       // Handle detailed error object
       logDeviceTokenRotationDenied({
         log: context.logGateway,
@@ -262,7 +266,7 @@ export const deviceHandlers: GatewayRequestHandlers = {
         role,
         reason: rotated.error,
         message: rotated.message,
-        details: rotated.details
+        details: rotated.details,
       });
       respond(
         false,
